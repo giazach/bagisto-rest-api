@@ -1,5 +1,5 @@
 {
-    "name": "bagisto/rest-api",
+    "name": "giazach/bagisto-rest-api",
     "license": "MIT",
     "authors": [
         {
@@ -9,6 +9,10 @@
         {
             "name": "Vivek Sharma",
             "email": "viveksh047@webkul.in"
+        },  
+        {
+            "name": "Giannis Zacharioudakis",
+            "email": "giannis.zacharioudakis@softbite.gr"
         }
     ],
     "require": {
