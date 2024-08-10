@@ -39,7 +39,7 @@ class ProductController extends CatalogController
      */
     public function store(Request $request)
     {
-        /*if (
+        if (
             ProductType::hasVariants($request->input('type'))
             && (! $request->has('super_attributes')
                 || ! count($request->get('super_attributes')))
@@ -47,7 +47,7 @@ class ProductController extends CatalogController
             return response([
                 'message' => trans('rest-api::app.admin.catalog.products.error.configurable-error'),
             ], 400);
-        }*/
+        }
 
         $request->validate([
             'type'                => 'required',
