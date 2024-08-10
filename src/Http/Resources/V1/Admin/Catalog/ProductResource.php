@@ -22,6 +22,9 @@ class ProductResource extends JsonResource
          */
         $mainAttributes = $this->resource->toArray();
 
+        if(!empty($mainAttributes['categories']))
+            $mainAttributes['categories'] = array_column($mainAttributes['categories'], 'id');
+
         return [
             /**
              * Main attributes.
