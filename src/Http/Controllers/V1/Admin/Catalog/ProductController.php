@@ -67,6 +67,29 @@ class ProductController extends CatalogController
         ]);
     }
 
+
+    public function createUploadedFileFromUrl(&$images) {
+
+        //also replace the
+        // if (request()->images)
+        // with
+        // if (request()->images && !empty(request()->images['files']))
+        //in packages/Webkul/Admin/src/Http/Requests/ProductForm.php rules()
+
+        foreach ($images as $imgKey => &$image) {
+            if(is_string($image)){
+                if(filter_var($image, FILTER_VALIDATE_URL)){
+                    $stream = @fopen($image, 'r');
+                    $tempFile = tempnam(sys_get_temp_dir(), 'url-file-');
+                    file_put_contents($tempFile, $stream);
+                    $images['files'][$imgKey] = new \Illuminate\Http\UploadedFile($tempFile, '');
+                }
+                else
+                    unset($images[$imgKey]);
+            }
+        }
+        $images = array_filter($images);
+    }
     /**
      * Update the specified resource in storage.
      *
@@ -76,7 +99,23 @@ class ProductController extends CatalogController
     {
         Event::dispatch('catalog.product.update.before', $id);
 
-        $product = $this->getRepositoryInstance()->update($request->all(), $id);
+        // trick to upload images via urls
+        $allreqs = $request->all();
+
+        // product
+        if(!empty($allreqs['images']))
+            $this->createUploadedFileFromUrl($allreqs['images']);
+
+        // variants
+        if(!empty($allreqs['variants'])){
+            foreach ($allreqs['variants'] as $key1 => &$variant) {
+                if(!empty($variant['images'])){
+                    $this->createUploadedFileFromUrl($variant['images']);
+                }        
+            }
+        }
+
+        $product = $this->getRepositoryInstance()->update($allreqs, $id);
 
         Event::dispatch('catalog.product.update.after', $product);
 
