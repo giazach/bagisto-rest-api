@@ -36,8 +36,20 @@ class ResourceController extends V1Controller implements ResourceContract
     public function allResources(Request $request)
     {
         $query = $this->getRepositoryInstance()->with('categories')->scopeQuery(function ($query) use ($request) {
+
+            // make a copy of findByAttributeCode to a new findAllByAttributeCode (packages/Webkul/Product/src/Repositories/ProductRepository)
+            // and replace the return with: return $this->findWhereIn('id', $filteredAttributeValues->pluck('product_id')->toArray())->all();
+            if($byAttributes = $request->input('attributes')){ // eg ['attributes' => ['partner' => 4]]
+                foreach ($byAttributes as $loop_code => $loop_value) {
+                    $results = $this->getRepositoryInstance()->findAllByAttributeCode($loop_code, $loop_value);
+                    $ids = array_column($results, 'id');
+                    $query = $query->whereIn('id', $ids);
+                }
+            }
+
             foreach ($request->except($this->requestException) as $input => $value) {
-                $query = $query->whereIn($input, array_map('trim', explode(',', $value)));
+                if(is_string($value))
+                    $query = $query->whereIn($input, array_map('trim', explode(',', $value)));
             }
 
             if ($sort = $request->input('sort')) {
