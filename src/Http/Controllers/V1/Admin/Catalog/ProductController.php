@@ -85,14 +85,20 @@ class ProductController extends CatalogController
 
         foreach ($images as $imgKey => &$image) {
             if(is_string($image)){
+                $image = urlencode($image);
+                $image = str_replace("%2F", "/", $image);
+                $image = str_replace("%3A//", "://", $image);                
                 if(filter_var($image, FILTER_VALIDATE_URL)){
-                    $stream = @fopen($image, 'r');
+                    $stream = fopen($image, 'r');
                     $tempFile = tempnam(sys_get_temp_dir(), 'url-file-');
                     file_put_contents($tempFile, $stream);
                     $images['files'][$imgKey] = new \Illuminate\Http\UploadedFile($tempFile, '');
                 }
                 else
                     unset($images[$imgKey]);
+            }
+            else{
+                // is image object from repository
             }
         }
         $images = array_filter($images);
