@@ -52,12 +52,19 @@ class ProductController extends CatalogController
         $request->validate([
             'type'                => 'required',
             'attribute_family_id' => 'required',
+            'partner'             => 'required',
             'sku'                 => ['required', 'unique:products,sku', new Slug],
         ]);
 
         Event::dispatch('catalog.product.create.before');
 
         $product = $this->getRepositoryInstance()->create($request->all());
+
+        $product = $this->getRepositoryInstance()->update([
+            //'channel' => null,
+            //'locale'  => null,
+            'partner'  => $request->partner,
+        ], $product->id, ['partner']);
 
         Event::dispatch('catalog.product.create.after', $product);
 
