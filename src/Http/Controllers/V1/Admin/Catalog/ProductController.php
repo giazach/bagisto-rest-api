@@ -87,7 +87,10 @@ class ProductController extends CatalogController
             if(is_string($image)){
                 $image = urlencode($image);
                 $image = str_replace("%2F", "/", $image);
-                $image = str_replace("%3A//", "://", $image);                
+                $image = str_replace("%3A//", "://", $image);     
+                $image = str_replace("%3F", "?", $image);     
+                $image = str_replace("%3D", "=", $image);     
+       
                 if(filter_var($image, FILTER_VALIDATE_URL)){
                     $stream = fopen($image, 'r');
                     $tempFile = tempnam(sys_get_temp_dir(), 'url-file-');
