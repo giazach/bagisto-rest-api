@@ -1,4 +1,4 @@
-# DO NOT USE THIS REPO
+# DO NOT USE THIS FORK
 <p>It will not work because it is personalized with custom functions of bagisto. You can check the commits for partial fixes/updates.</p>
 
 # Bagisto REST API
