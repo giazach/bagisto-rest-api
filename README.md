@@ -1,3 +1,6 @@
+# DO NOT USE THIS REPO
+<p>It will not work because it is personalized with custom functions of bagisto. You can check the commits for partial fixes/updates.</p>
+
 # Bagisto REST API
 
 <p>Bagisto REST API is a medium to use the features of the core Bagisto System. By using Bagisto REST API, you can integrate your application to serve the default content of Bagisto.</p>
