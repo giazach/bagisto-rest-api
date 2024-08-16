@@ -89,25 +89,27 @@ class ProductController extends CatalogController
                 $image = str_replace("%2F", "/", $image);
                 $image = str_replace("%3A//", "://", $image);     
                 $image = str_replace("%3F", "?", $image);     
-                $image = str_replace("%3D", "=", $image);     
+                $image = str_replace("%3D", "=", $image); 
+                $image = str_replace("%40", "@", $image); 
        
                 if(filter_var($image, FILTER_VALIDATE_URL)){
                     $second_try = 0;
+
+                    $arrContextOptions=array(
+                        "http" => array(
+                            "ignore_errors" => true,
+                        ),
+                        "ssl"=>array(
+                            "allow_self_signed"=>true,
+                            "verify_peer"=>false,
+                            "verify_peer_name"=>false,
+                        ),
+                    );
+
                     TRYAGAIN:
-                    $stream = @fopen($image, 'r');
+                    $stream = @fopen($image, 'r', false, stream_context_create($arrContextOptions));
                     if(!$stream){
                         sleep(rand(1,5));
-                        $arrContextOptions=array(
-                            "http" => array(
-                                "ignore_errors" => true,
-                            ),
-                            "ssl"=>array(
-                                "allow_self_signed"=>true,
-                                "verify_peer"=>false,
-                                "verify_peer_name"=>false,
-                            ),
-                        );
-
                         $stream = @file_get_contents($image, false, stream_context_create($arrContextOptions));
                     }
                     if(!$stream){
