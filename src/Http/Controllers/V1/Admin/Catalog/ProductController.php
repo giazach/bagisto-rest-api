@@ -92,10 +92,46 @@ class ProductController extends CatalogController
                 $image = str_replace("%3D", "=", $image);     
        
                 if(filter_var($image, FILTER_VALIDATE_URL)){
-                    $stream = fopen($image, 'r');
-                    $tempFile = tempnam(sys_get_temp_dir(), 'url-file-');
-                    file_put_contents($tempFile, $stream);
-                    $images['files'][$imgKey] = new \Illuminate\Http\UploadedFile($tempFile, '');
+                    $second_try = 0;
+                    TRYAGAIN:
+                    $stream = @fopen($image, 'r');
+                    if(!$stream){
+                        sleep(rand(1,5));
+                        $arrContextOptions=array(
+                            "http" => array(
+                                "ignore_errors" => true,
+                            ),
+                            "ssl"=>array(
+                                "allow_self_signed"=>true,
+                                "verify_peer"=>false,
+                                "verify_peer_name"=>false,
+                            ),
+                        );
+
+                        $stream = @file_get_contents($image, false, stream_context_create($arrContextOptions));
+                    }
+                    if(!$stream){
+                        sleep(rand(1,5));
+                        $ch = curl_init($image);
+                        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                        $stream = curl_exec($ch); 
+                        $errors = curl_error($ch);
+                        curl_close($ch);
+
+                        //if($errors)
+                        //    var_dump($errors);
+                    }
+
+                    if($stream){
+                        $tempFile = tempnam(sys_get_temp_dir(), 'url-file-');
+                        file_put_contents($tempFile, $stream);
+                        $images['files'][$imgKey] = new \Illuminate\Http\UploadedFile($tempFile, '');                       
+                    }
+                    elseif(!$second_try){
+                        sleep(rand(5,10));
+                        $second_try = 1;
+                        goto TRYAGAIN;
+                    }
                 }
                 else
                     unset($images[$imgKey]);
